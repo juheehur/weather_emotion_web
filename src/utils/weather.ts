@@ -1,6 +1,6 @@
 import { WeatherData, ClothingRecommendation } from '@/types/weather';
 
-const API_KEY = process.env.WEATHERAPI_KEY;
+const API_KEY = process.env.NEXT_PUBLIC_WEATHERAPI_KEY;
 const BASE_URL = 'http://api.weatherapi.com/v1';
 
 export async function getCurrentWeather(lat: number, lon: number): Promise<WeatherData> {
