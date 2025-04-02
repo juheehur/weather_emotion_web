@@ -185,7 +185,7 @@ export default function Home() {
                 습도 {weather.current.humidity}% · 풍속 {(weather.current.wind_kph * 1000 / 3600).toFixed(1)}m/s
               </p>
             </div>
-            <div className="flex justify-center">
+            <div className="flex justify-center flex-col items-center">
               <button 
                 onClick={() => setShowClothingPopup(true)}
                 className="cursor-pointer transition-transform hover:scale-105"
@@ -197,6 +197,9 @@ export default function Home() {
                   height={200}
                 />
               </button>
+              <p className="mt-2 text-sm text-gray-500 flex items-center gap-1">
+                <span>👆</span> 고양이를 클릭하면 오늘의 옷차림을 추천해드려요!
+              </p>
             </div>
           </div>
         )}
