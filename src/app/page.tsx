@@ -58,7 +58,7 @@ export default function Home() {
               position.coords.longitude
             );
             setWeather(data);
-          } catch (err) {
+          } catch (_err) {
             setError('날씨 정보를 가져오는데 실패했습니다.');
           } finally {
             setLoading(false);
@@ -111,7 +111,7 @@ export default function Home() {
         ].slice(0, 5);
         return newHistory;
       });
-    } catch (err) {
+    } catch (_err) {
       setError('도시를 찾을 수 없습니다.');
     }
   };
