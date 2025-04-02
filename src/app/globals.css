@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Ownglyph_ParkDaHyun';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2411-3@1.0/Ownglyph_ParkDaHyun.woff2') format('woff2');
+  font-family: 'LeeSeoyun';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2202-2@1.0/LeeSeoyun.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -22,5 +22,5 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: var(--background);
-  font-family: 'Ownglyph_ParkDaHyun', sans-serif;
+  font-family: 'LeeSeoyun', sans-serif;
 }

@@ -5,6 +5,35 @@ import { WeatherData, SearchHistory } from '@/types/weather';
 import { getCurrentWeather, getWeatherByCity, getClothingRecommendation, getCatImage } from '@/utils/weather';
 import Image from 'next/image';
 
+interface ClothingPopupProps {
+  temp: number;
+  onClose: () => void;
+}
+
+function ClothingPopup({ temp, onClose }: ClothingPopupProps) {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black/40" onClick={onClose}>
+      <div 
+        className="bg-white p-6 rounded-3xl max-w-sm w-full mx-4" 
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="text-center space-y-4">
+          <h3 className="text-xl mb-2">오늘의 옷차림 추천</h3>
+          <p className="text-gray-600">
+            {getClothingRecommendation(temp).description}
+          </p>
+          <button 
+            onClick={onClose}
+            className="mt-4 px-4 py-2 bg-gray-100 rounded-full text-sm"
+          >
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -12,6 +41,7 @@ export default function Home() {
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showClothingPopup, setShowClothingPopup] = useState(false);
 
   useEffect(() => {
     // 시스템 다크모드 감지
@@ -100,121 +130,98 @@ export default function Home() {
   }
 
   return (
-    <main className={`min-h-screen p-4 md:p-8 ${isDarkMode ? 'dark' : ''}`}>
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8 bg-white/80 dark:bg-gray-800/80 p-4 rounded-2xl backdrop-blur-sm shadow-lg">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <span className="text-5xl">🐱</span>
-            날씨가 기분이다냥
-          </h1>
+    <main className={`min-h-screen p-4 ${isDarkMode ? 'dark' : ''}`}>
+      <div className="max-w-md mx-auto text-center">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-2">
+            <span className="text-3xl">🐱</span>
+            <h1 className="text-2xl">날씨가 기분이다냥</h1>
+          </div>
           <button
             onClick={toggleDarkMode}
-            className="p-3 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-md"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100"
           >
             {isDarkMode ? '🌞' : '🌙'}
           </button>
         </div>
 
         <form onSubmit={handleSearch} className="mb-8">
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="도시 이름을 입력하세요 (예: 서울, 부산, 제주)"
-              className="flex-1 p-4 rounded-2xl border-2 border-gray-200 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 backdrop-blur-sm focus:outline-none focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-300"
+              placeholder="도시 이름을 입력하세요"
+              className="flex-1 p-3 rounded-full bg-gray-100 text-gray-900 placeholder-gray-400 focus:outline-none"
             />
             <button
               type="submit"
-              className="px-6 py-4 bg-blue-500 text-white rounded-2xl hover:bg-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95"
+              className="px-6 py-3 rounded-full bg-gray-100 text-gray-900"
             >
-              찾기 🔍
+              검색
             </button>
           </div>
         </form>
 
         {error && (
-          <div className="p-4 mb-8 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200 rounded-2xl border-2 border-red-100 dark:border-red-800 backdrop-blur-sm">
-            <p className="flex items-center gap-2">
-              <span className="text-xl">⚠️</span>
-              {error}
-            </p>
+          <div className="p-4 mb-8 text-red-500 text-center">
+            {error}
           </div>
         )}
 
         {weather && (
-          <div className="bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-lg p-8 backdrop-blur-sm border-2 border-gray-100 dark:border-gray-700">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <span>{weather.current.condition.text === 'Sunny' ? '☀️' : 
-                         weather.current.condition.text === 'Cloudy' ? '☁️' : 
-                         weather.current.condition.text.includes('rain') ? '🌧️' : 
-                         weather.current.condition.text.includes('snow') ? '❄️' : '🌤️'}</span>
-                  {weather.location.name}
-                </h2>
-                <div className="space-y-4 bg-gray-50/50 dark:bg-gray-700/50 p-6 rounded-xl">
-                  <p className="text-2xl text-gray-900 dark:text-white">
-                    {weather.current.temp_c}°C
-                  </p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">체감온도</p>
-                      <p className="text-lg text-gray-700 dark:text-gray-200">{weather.current.feelslike_c}°C</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">습도</p>
-                      <p className="text-lg text-gray-700 dark:text-gray-200">{weather.current.humidity}%</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">풍속</p>
-                      <p className="text-lg text-gray-700 dark:text-gray-200">{weather.current.wind_kph} km/h</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-blue-50/50 dark:bg-blue-900/30 p-6 rounded-xl">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                    오늘의 옷차림 추천 💁‍♀️
-                  </h3>
-                  <p className="text-gray-700 dark:text-gray-200 text-lg">
-                    {getClothingRecommendation(weather.current.temp_c).description}{' '}
-                    {getClothingRecommendation(weather.current.temp_c).emoji}
-                  </p>
-                </div>
-              </div>
-              <div className="flex justify-center items-center bg-gray-50/50 dark:bg-gray-700/50 rounded-xl p-6">
-                <div className="relative group">
-                  <Image
-                    src={getCatImage(weather.current.temp_c)}
-                    alt="날씨에 맞는 고양이"
-                    width={250}
-                    height={250}
-                    className="rounded-xl transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-              </div>
+          <div className="space-y-8">
+            <h2 className="text-2xl">
+              {weather.location.name}
+            </h2>
+            <div className="space-y-2">
+              <p className="text-6xl font-light">
+                {weather.current.temp_c}°C
+              </p>
+              <p className="text-xl text-gray-600">
+                {weather.current.condition.text}
+              </p>
+              <p className="text-gray-500">
+                습도 {weather.current.humidity}% · 풍속 {(weather.current.wind_kph * 1000 / 3600).toFixed(1)}m/s
+              </p>
+            </div>
+            <div className="flex justify-center">
+              <button 
+                onClick={() => setShowClothingPopup(true)}
+                className="cursor-pointer transition-transform hover:scale-105"
+              >
+                <Image
+                  src={getCatImage(weather.current.temp_c)}
+                  alt="날씨에 맞는 고양이 (클릭하여 옷차림 추천 보기)"
+                  width={200}
+                  height={200}
+                />
+              </button>
             </div>
           </div>
         )}
 
         {searchHistory.length > 0 && (
-          <div className="mt-8 bg-white/80 dark:bg-gray-800/80 rounded-2xl p-6 backdrop-blur-sm border-2 border-gray-100 dark:border-gray-700">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <span>📝</span> 최근 검색 기록
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="mt-8">
+            <div className="flex flex-wrap gap-2 justify-center">
               {searchHistory.map((item) => (
                 <button
                   key={item.timestamp}
                   onClick={() => setSearchQuery(item.city)}
-                  className="p-3 text-center rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-300 text-gray-700 dark:text-gray-200"
+                  className="px-4 py-2 text-sm bg-gray-100 text-gray-600 rounded-full"
                 >
                   {item.city}
                 </button>
               ))}
             </div>
           </div>
+        )}
+
+        {showClothingPopup && weather && (
+          <ClothingPopup
+            temp={weather.current.temp_c}
+            onClose={() => setShowClothingPopup(false)}
+          />
         )}
       </div>
     </main>
